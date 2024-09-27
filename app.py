@@ -67,6 +67,8 @@ def show_user(username):
     if 'user_id' not in session:
         flash('Please Login To View')
         return redirect('/')
+    if session['user_id'] != username:
+        return('Access Denied')    
     user = User.query.get_or_404(session['user_id'])
     feedback = user.feedback
     form = FeedbackForm()
@@ -111,9 +113,11 @@ def delete_feedback(id):
 @app.route('/users/<username>/feedback/add', methods = ['GET', 'POST'])
 def add_feedback(username):
     user = User.query.get_or_404(username)
-    if 'user_id' not in session or session['user_id'] != username:
+    if 'user_id' not in session:
         flash('You must be logged in to add feedback', 'danger')
         return redirect('/')
+    if session['user_id'] != username:
+        return('Access Denied')
     form = FeedbackForm()
     if form.validate_on_submit():
         title = form.title.data
@@ -127,32 +131,24 @@ def add_feedback(username):
 
 @app.route('/feedback/<int:id>/update', methods = ['GET', 'POST'])
 def update_feedback(id):
-    user = User.query.get_or_404(session['user_id'])
-    feedback = Feedback.query.get_or_404(id)
-    form = FeedbackForm(obj = feedback)
     if 'user_id' not in session:
         flash('Please login first!', 'danger')
         return redirect('/')
-    if feedback.username == session['user_id']:
-        if form.validate_on_submit():
-            feedback.title = form.title.data
-            feedback.content = form.content.data
-            db.session.commit()
-            flash('Feedback has been updated!', 'success')
-            return redirect(url_for('show_user', username = session['user_id']))
+    user = User.query.get_or_404(session['user_id'])
+    feedback = Feedback.query.get_or_404(id)
+    form = FeedbackForm(obj = feedback)
+
+    if feedback.username != session['user_id']:
+        return('Access Denied')
+
+    if form.validate_on_submit():
+        feedback.title = form.title.data
+        feedback.content = form.content.data
+        db.session.commit()
+        flash('Feedback has been updated!', 'success')
+        return redirect(url_for('show_user', username = session['user_id']))
     return render_template('update_feedback.html', user = user, feedback = feedback, form = form)
 
-
-
-
-
-# **GET */feedback/<feedback-id>/update :*** Display a form to edit feedback —
-# Make sure that only the user who has 
-# written that feedback can see this form **
-
-# **POST */feedback/<feedback-id>/update :*** Update a specific piece of feedback
-# and redirect to /users/<username> — **Make sure that only the user who has 
-# written that feedback can update it.**
 
 
 
