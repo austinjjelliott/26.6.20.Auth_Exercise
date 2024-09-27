@@ -55,7 +55,7 @@ def login_user():
 
         user = User.authenticate(username, password)
         if user:
-            flash(f'Welcome Back {user.username}', 'primary')
+            flash(f'Welcome Back {user.username}', 'success')
             session['user_id'] = user.username
             return redirect('/secret')
         else:
@@ -66,3 +66,8 @@ def login_user():
 def show_secret():
     return 'You Made It'
 
+@app.route('/logout')
+def logout_user():
+    session.pop('user_id')
+    flash('You Are Now Logged Out', 'danger')
+    return redirect('/')
