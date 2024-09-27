@@ -38,6 +38,9 @@ def register_user():
         except IntegrityError:
             form.username.errors.append('Username Taken - Please Try Another')
             return render_template('register.html', form = form)
+        
+        session['user_id'] = new_user.username
+        flash('Welcome! Successfully created your account', 'success')
         return redirect('/secret')
 
     return(render_template('register.html', form = form ))
@@ -53,6 +56,7 @@ def login_user():
         user = User.authenticate(username, password)
         if user:
             flash(f'Welcome Back {user.username}', 'primary')
+            session['user_id'] = user.username
             return redirect('/secret')
         else:
             form.username.errors = ['Invalid Username/Password']
@@ -61,3 +65,4 @@ def login_user():
 @app.route('/secret')
 def show_secret():
     return 'You Made It'
+
