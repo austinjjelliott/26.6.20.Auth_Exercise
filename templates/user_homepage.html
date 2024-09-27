@@ -6,7 +6,44 @@
     <p>Username: {{ user.username }}</p>
     <p>Email: {{ user.email }}</p>
     <p>Name: {{user.first_name }} {{user.last_name }}</p>
+    <form
+      style="display: inline"
+      action="{{url_for('delete_user', username = user.username) }}"
+      method="POST"
+    >
+      <button class="btn btn-danger btn-sm">
+        <i class="fa-regular fa-trash-can"></i> Delete User
+      </button>
+    </form>
+    <hr />
+    <a class="" href="/users/{{user.username}}/feedback/add">Add Feedback</a>
+    <hr />
   </div>
 </div>
 
-{% endblock %}
+{% for feed in feedback %}
+<div>
+  <div class="card my-2">
+    <div class="card-body">
+      <h5 class="card-title text-success">{{ feed.title}}</h5>
+      <p class="card-text">{{ feed.content }}</p>
+      <form
+        style="display: inline"
+        action="{{url_for('delete_feedback', id = feed.id) }}"
+        method="POST"
+      >
+        <button class="btn btn-danger btn-sm">
+          <i class="fa-regular fa-trash-can"></i> Delete Feedback
+        </button>
+      </form>
+      <form
+        style="display: inline"
+        action="{{url_for('update_feedback', id = feed.id) }}"
+        method="POST"
+      >
+        <button class="btn btn-info btn-sm">Update Feedback</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endfor %} {% endblock %}
