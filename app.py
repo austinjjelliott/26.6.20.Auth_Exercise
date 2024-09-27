@@ -41,7 +41,7 @@ def register_user():
         
         session['user_id'] = new_user.username
         flash('Welcome! Successfully created your account', 'success')
-        return redirect('/secret')
+        return redirect(f'/users/{username}')
 
     return(render_template('register.html', form = form ))
 
@@ -57,14 +57,20 @@ def login_user():
         if user:
             flash(f'Welcome Back {user.username}', 'success')
             session['user_id'] = user.username
-            return redirect('/secret')
+            return redirect(f'/users/{username}')
         else:
             form.username.errors = ['Invalid Username/Password']
     return (render_template('/login.html', form = form))
 
-@app.route('/secret')
-def show_secret():
-    return 'You Made It'
+@app.route('/users/<username>')
+def show_user(username):
+    if 'user_id' not in session:
+        flash('Please Login To View')
+        return redirect('/')
+    user = User.query.get_or_404(session['user_id'])
+    return render_template('user_homepage.html', user = user)
+
+
 
 @app.route('/logout')
 def logout_user():
